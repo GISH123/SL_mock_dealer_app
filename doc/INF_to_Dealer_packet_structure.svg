@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="950" height="1100" viewBox="0 0 950 1100"
+     xmlns="http://www.w3.org/2000/svg"
+     style="font-family:sans-serif; background-color:#FFFFFF;">
+
+  <!-- TITLE -->
+  <rect x="10" y="10" width="930" height="40" fill="#EEE" stroke="#333" stroke-width="1"/>
+  <text x="475" y="35" text-anchor="middle" font-size="18" font-weight="bold">
+    Dealer Protocol Commands &amp; Packet Formats (A packet = 1.Header + 2.Body)
+  </text>
+  
+  <!-- 1) Common Header Section -->
+  <text x="20" y="80" font-size="16" font-weight="bold">1) Common Packet Header (12 bytes)</text>
+  <rect x="10" y="90" width="930" height="70" fill="none" stroke="#333" stroke-width="1"/>
+
+  <!-- Header: CMD field -->
+  <rect x="10" y="90" width="310" height="70" fill="#E9F5FF" stroke="#333" stroke-width="1"/>
+  <text x="165" y="115" text-anchor="middle" font-size="13" font-weight="bold">CMD (4B, unsigned int; I)</text>
+  <text x="165" y="140" text-anchor="middle" font-size="11">(e.g., 0xBA0002)</text>
+
+  <!-- Header: SIZE field -->
+  <rect x="320" y="90" width="310" height="70" fill="#FFFAE1" stroke="#333" stroke-width="1"/>
+  <text x="475" y="115" text-anchor="middle" font-size="13" font-weight="bold">SIZE (4B, signed int; i)</text>
+  <text x="475" y="140" text-anchor="middle" font-size="11">header + body length(Total packet bytes)</text>
+
+  <!-- Header: SEQ field -->
+  <rect x="630" y="90" width="310" height="70" fill="#E8FFE8" stroke="#333" stroke-width="1"/>
+  <text x="785" y="115" text-anchor="middle" font-size="13" font-weight="bold">SEQ (4B, unsigned int; I)</text>
+  <text x="785" y="140" text-anchor="middle" font-size="11">Sequence number</text>
+
+  <text x="20" y="175" font-size="12" fill="#666">
+    Note: 'CMD' identifies the command (0xBA0002), 'SIZE' = header + body length, 'SEQ' can track requests.
+  </text>
+
+  <!-- 2) Commands & Their Bodies Section -->
+  <text x="20" y="210" font-size="16" font-weight="bold">2a) 接收封包 Command-Specific Body Formats(remote dealer荷官端 to pydealer推論端)</text>
+
+   <!-- FOOTER NOTE -->
+  <text x="475" y="225" text-anchor="middle" font-size="11" fill="#666">
+    All packets: 12-byte header + command-specific body. Byte order: Network (big-endian).
+  </text>
+
+  <!-- Each command in its own box -->
+
+  <!-- CMD_LOGIN_R = 0xBA0002 -->
+  <rect x="10" y="230" width="930" height="65" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="250" font-size="13" font-weight="bold">CMD_LOGIN_R (0xBA0002):</text>
+  <text x="25" y="265" font-size="12">• Body = 
+    <tspan font-weight="bold">code</tspan> (4B), 
+    <tspan font-weight="bold">gmtype</tspan> (4B), 
+    <tspan font-weight="bold">vid</tspan> (4B)
+  </text>
+  <text x="25" y="280" font-size="11" fill="#666">(Struct format: '!i4s4s')</text>
+
+  <!-- CMD_START_PREDICT = 0xBA0003 -->
+  <rect x="10" y="300" width="930" height="65" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="320" font-size="13" font-weight="bold">CMD_START_PREDICT (0xBA0003):</text>
+  <text x="25" y="335" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B), 
+    <tspan font-weight="bold">gmstate</tspan> (2B)
+  </text>
+  <text x="25" y="350" font-size="11" fill="#666">(Struct format: '!14sh')</text>
+
+  <!-- CMD_STOP_PREDICT = 0xBA0004 -->
+  <rect x="10" y="370" width="930" height="65" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="390" font-size="13" font-weight="bold">CMD_STOP_PREDICT (0xBA0004):</text>
+  <text x="25" y="405" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B), 
+    <tspan font-weight="bold">gmstate</tspan> (2B)
+  </text>
+  <text x="25" y="420" font-size="11" fill="#666">(Struct format: '!14sh')</text>
+
+  <!-- CMD_SCAN_RESULT = 0xBA0005 -->
+  <rect x="10" y="440" width="930" height="65" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="460" font-size="13" font-weight="bold">CMD_SCAN_RESULT (0xBA0005):</text>
+  <text x="25" y="475" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B), 
+    <tspan font-weight="bold">index</tspan> (2B), 
+    <tspan font-weight="bold">cardVal</tspan> (2B)
+  </text>
+  <text x="25" y="490" font-size="11" fill="#666">(Struct format: '!14s2h')</text>
+
+  <!-- CMD_DISPATCH_INDEX = 0xBA0006 -->
+  <rect x="10" y="510" width="930" height="65" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="530" font-size="13" font-weight="bold">CMD_DISPATCH_INDEX (0xBA0006):</text>
+  <text x="25" y="545" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B), 
+    <tspan font-weight="bold">index</tspan> (2B)
+  </text>
+  <text x="25" y="560" font-size="11" fill="#666">(Struct format: '!14sh')</text>
+
+  <!-- CMD_SAVE_RESULT = 0xBA0007 -->
+  <rect x="10" y="580" width="930" height="60" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="600" font-size="13" font-weight="bold">CMD_SAVE_RESULT (0xBA0007):</text>
+  <text x="25" y="615" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B)
+  </text>
+  <text x="25" y="630" font-size="11" fill="#666">(Struct format: '!14s')</text>
+
+  <!-- CMD_CANCEL_RESULT = 0xBA0008 -->
+  <rect x="10" y="650" width="930" height="60" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="670" font-size="13" font-weight="bold">CMD_CANCEL_RESULT (0xBA0008):</text>
+  <text x="25" y="685" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B)
+  </text>
+  <text x="25" y="700" font-size="11" fill="#666">(Struct format: '!14s')</text>
+
+  <!-- CMD_PREDICT_REF = 0xBA0009 -->
+  <rect x="10" y="720" width="930" height="60" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="740" font-size="13" font-weight="bold">CMD_PREDICT_REF (0xBA0009):</text>
+  <text x="25" y="755" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B)
+  </text>
+  <text x="25" y="770" font-size="11" fill="#666">(Struct format: '!14s')</text>
+  
+  <!-- 2b) Commands & Their Bodies Section -->
+  <text x="20" y="805" font-size="16" font-weight="bold">2b) 傳出封包 Command-Specific Body Formats(pydealer推論端 to remote dealer荷官端)</text>
+  
+   <!-- FOOTER NOTE -->
+  <text x="475" y="820" text-anchor="middle" font-size="11" fill="#666">
+    All packets: 12-byte header + command-specific body. Byte order: Network (big-endian).
+  </text>
+  
+  <!-- CMD_LOGIN = 0xAB0002 -->
+  <rect x="10" y="825" width="930" height="60" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="845" font-size="13" font-weight="bold">CMD_LOGIN (0xAB0002):</text>
+  <text x="25" y="860" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B)
+  </text>
+  <text x="25" y="875" font-size="11" fill="#666">(Struct format: '!3i4s')</text>
+  
+   <!-- CMD_PREDICT_RESULT = 0xAB0004 -->
+  <rect x="10" y="885" width="930" height="80" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="25" y="900" font-size="13" font-weight="bold">CMD_PREDICT_RESULT (0xAB0004):</text>
+  <text x="25" y="915" font-size="12">• Body = 
+    <tspan font-weight="bold">gmcode</tspan> (14B)
+  </text>
+  <text x="25" y="930" font-size="11" fill="#666">(Struct format: '!14s')  -  註，main branch版本就已經沒有使用到CMD_PREDICT_RESULT，改為在DealerClient.sendPredictResult()裡面寫死封包結構</text>
+  <text x="25" y="945" font-size="11" fill="#666"> body = struct.pack('!14sh', self.gamecode, count)</text>
+
+</svg>

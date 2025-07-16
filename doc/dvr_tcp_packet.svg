@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="960" height="750"            
+     viewBox="0 0 960 750"               
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Segoe UI, Helvetica, Arial, sans-serif"
+     font-size="14" stroke="#333" fill="none" >
+
+  <style>
+    .title { font-size:18px; font-weight:bold; fill:#12306B; }
+    .hdr   { font-weight:600; fill:#e6efff; }
+    .sub   { font-weight:600; fill:#d3e1ff; }
+    .tbl   { fill:#ffffff; }
+    .code  { font-family:Consolas, monospace; }
+    .note  { font-size:12px; font-style:italic; }
+    rect   { stroke-width:1; }
+  </style>
+
+  <!-- Title bar -->
+  <rect x="2" y="2" width="956" height="34" fill="#d3e1ff"/>
+  <text x="10" y="24" class="title">
+    TCP-DVR Dealer Packet Formats (30-byte request / 30-byte response)
+  </text>
+
+  <!-- 1. Dealer → DVR (DEALER_CMD_T) -->
+  <rect class="hdr" x="2" y="40" width="956" height="28"/>
+  <text x="10" y="60" class="hdr">
+    1) Dealer-side Request  –  struct <tspan class="code">DEALER_CMD_T</tspan> (30 bytes, big-endian)
+  </text>
+
+  <!-- field header -->
+  <rect class="sub" x="2" y="70" width="250" height="26"/>
+  <rect class="sub" x="252" y="70" width="706" height="26"/>
+  <text x="12" y="88"><tspan class="code">Field  (size)</tspan></text>
+  <text x="262" y="88"><tspan class="code">Description</tspan></text>
+
+  <!-- cmd -->
+  <rect class="tbl" x="2"  y="96" width="250" height="26"/>
+  <rect class="tbl" x="252" y="96" width="706" height="26"/>
+  <text x="12"  y="114" fill="#111"><tspan class="code">cmd   (4B)</tspan></text>
+  <text x="262" y="114" fill="#111">Command ID (e.g. 0x00020001)</text>
+
+  <!-- size -->
+  <rect class="tbl" x="2"  y="122" width="250" height="26"/>
+  <rect class="tbl" x="252" y="122" width="706" height="26"/>
+  <text x="12"  y="140" fill="#111"><tspan class="code">size  (4B)</tspan></text>
+  <text x="262" y="140" fill="#111">Total packet bytes (always 30)</text>
+
+  <!-- ver -->
+  <rect class="tbl" x="2"  y="148" width="250" height="26"/>
+  <rect class="tbl" x="252" y="148" width="706" height="26"/>
+  <text x="12"  y="166" fill="#111"><tspan class="code">ver   (2B)</tspan></text>
+  <text x="262" y="166" fill="#111">version (default 1)</text>
+
+  <!-- table -->
+  <rect class="tbl" x="2"  y="174" width="250" height="26"/>
+  <rect class="tbl" x="252" y="174" width="706" height="26"/>
+  <text x="12"  y="192" fill="#111"><tspan class="code">table (4B)</tspan></text>
+  <text x="262" y="192" fill="#111">Table ID / shoe ID (ASCII)</text>
+
+  <!-- gmcode -->
+  <rect class="tbl" x="2"  y="200" width="250" height="26"/>
+  <rect class="tbl" x="252" y="200" width="706" height="26"/>
+  <text x="12"  y="218" fill="#111"><tspan class="code">gmcode (16B)</tspan></text>
+  <text x="262" y="218" fill="#111">Round code (ASCII, padded 0)</text>
+
+  <!-- Dealer command list -->
+  <rect class="sub" x="2" y="232" width="956" height="26"/>
+  <text x="10" y="250" font-weight="600">Dealer Commands (<tspan class="code">cmd</tspan> field)</text>
+
+  <rect class="tbl" x="2" y="258" width="956" height="110"/>
+  <text class="code" x="12" y="276" fill="#111">0x00020001 START_RECORD </text>
+  <text class="code" x="12" y="296" fill="#111">0x00020002 STOP_RECORD  </text>
+  <text class="code" x="12" y="316" fill="#111">0x00020003 START_PLACE  </text>
+  <text class="code" x="12" y="336" fill="#111">0x00020004 STOP_PLACE   </text>
+  <text class="code" x="12" y="356" fill="#111">0x0002000F  KEEPALIVE   </text>
+
+  <!-- 2. DVR → Dealer (DEALER_RES_T) -->
+  <rect class="hdr" x="2" y="378" width="956" height="28"/>
+  <text x="10" y="398" class="hdr">
+    2) DVR-side Response  –  struct <tspan class="code">DEALER_RES_T</tspan> (30 bytes, big-endian)
+  </text>
+
+  <!-- field header -->
+  <rect class="sub" x="2" y="408" width="250" height="26"/>
+  <rect class="sub" x="252" y="408" width="706" height="26"/>
+  <text x="12" y="426"><tspan class="code">Field  (size)</tspan></text>
+  <text x="262" y="426"><tspan class="code">Description</tspan></text>
+
+  <!-- cmd -->
+  <rect class="tbl" x="2"  y="434" width="250" height="26"/>
+  <rect class="tbl" x="252" y="434" width="706" height="26"/>
+  <text x="12"  y="452" fill="#111"><tspan class="code">cmd   (4B)</tspan></text>
+  <text x="262" y="452" fill="#111">Command ID (reply variant)</text>
+
+  <!-- size -->
+  <rect class="tbl" x="2"  y="460" width="250" height="26"/>
+  <rect class="tbl" x="252" y="460" width="706" height="26"/>
+  <text x="12"  y="478" fill="#111"><tspan class="code">size  (4B)</tspan></text>
+  <text x="262" y="478" fill="#111">Total bytes (always 30)</text>
+
+  <!-- ver -->
+  <rect class="tbl" x="2"  y="486" width="250" height="26"/>
+  <rect class="tbl" x="252" y="486" width="706" height="26"/>
+  <text x="12"  y="504" fill="#111"><tspan class="code">ver   (2B)</tspan></text>
+  <text x="262" y="504" fill="#111">version (echo)</text>
+
+  <!-- gmcode -->
+  <rect class="tbl" x="2"  y="512" width="250" height="26"/>
+  <rect class="tbl" x="252" y="512" width="706" height="26"/>
+  <text x="12"  y="530" fill="#111"><tspan class="code">gmcode (16B)</tspan></text>
+  <text x="262" y="530" fill="#111">Round code echoed back</text>
+
+  <!-- ret -->
+  <rect class="tbl" x="2"  y="538" width="250" height="26"/>
+  <rect class="tbl" x="252" y="538" width="706" height="26"/>
+  <text x="12"  y="556" fill="#111"><tspan class="code">ret   (4B)</tspan></text>
+  <text x="262" y="556" fill="#111">Return code </text>
+
+  <!-- DVR command list -->
+  <rect class="sub" x="2" y="570" width="956" height="26"/>
+  <text x="10" y="588" font-weight="600">DVR Response Commands (<tspan class="code">cmd</tspan> field)</text>
+
+  <!-- DVR-side command list table -->
+  <rect class="tbl" x="2"  y="598" width="956" height="110"/>
+
+  <text class="code" x="12" y="616" fill="#111">
+    0x00021001 START_RECORD_R 
+  </text>
+  <text class="code" x="12" y="636" fill="#111">
+    0x00021002 STOP_RECORD_R  
+  </text>
+  <text class="code" x="12" y="656" fill="#111">
+    0x00021003 START_PLACE_R  
+  </text>
+  <text class="code" x="12" y="676" fill="#111">
+    0x00021004 STOP_PLACE_R   
+  </text>
+  <text class="code" x="12" y="696" fill="#111">
+    0x00FFFFFF UNKNOWN MSG, note: 目前以這個代表keep-alive機制的運行          
+  </text>
+
+  <!-- note (shifted down by +60px so it now lives inside the new canvas) -->
+  <text class="note" x="10" y="740">
+    All packets fixed at 30 bytes · Network byte-order · Field alignment matches
+    <tspan class="code">#pragma pack(2)</tspan>.
+  </text>
+</svg>

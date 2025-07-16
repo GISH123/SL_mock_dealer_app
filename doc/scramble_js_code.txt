@@ -1,0 +1,33 @@
+/* 1️⃣  secret XOR key (same bytes as Python) */
+const KEY = new TextEncoder().encode("HWm9q2StMUErv34a");
+
+/* 2️⃣  example payload (must match Python values + field order!) */
+const payload = {
+  route   : "record",
+  action  : "stop",
+  gmcode  : "abcd",
+  table   : "T032",
+  dvr_ip  : "127.0.0.1",
+  dvr_port: 11007
+};
+
+/* 3️⃣  re-serialize JSON the *same* way Python default does:
+        - a single space after every ':' and ','                */
+function dumpsLikePython(obj){
+  return JSON.stringify(obj)
+               .replace(/:/g, ': ')        // add space after every colon
+               .replace(/,/g, ', ');       // add space after every comma
+}
+
+/* 4️⃣  XOR + url-safe Base64 (no padding) */
+function makeCipher(obj) {
+  const canon = dumpsLikePython(obj);                            // step A
+  const raw   = new TextEncoder().encode(canon);                 // step B
+  const xor   = raw.map((b,i)=> b ^ KEY[i % KEY.length]);        // step C
+  return btoa(String.fromCharCode(...xor))                       // step D
+           .replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+
+/* 5️⃣  Run the demo */
+const JS_OUTPUT = makeCipher(payload);
+console.log("JS cipher :", JS_OUTPUT);          // should equal Python’s line

@@ -1,0 +1,7 @@
+build/
+/dist/
+!dist/*.zip
+*.crt
+*.key
+*.pyc
+static/*
