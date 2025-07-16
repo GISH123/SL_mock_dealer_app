@@ -1,4 +1,3 @@
-20250623 add pyproject.toml to replace requirement.txt  
 pip install --upgrade pip build  
 pip install hatch  # OR poetry, whichever you like  
 hatch env create   # makes a venv and resolves hashes  
