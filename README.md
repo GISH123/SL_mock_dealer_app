@@ -1,0 +1,2 @@
+# SL_mock_dealer_app
+使用HTTP Request的方式實踐原本的服務傳遞模式，並且自製模擬荷官端來模擬發送訊息
