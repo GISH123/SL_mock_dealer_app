@@ -1,9 +1,5 @@
-pip install --upgrade pip build  
-pip install hatch  # OR poetry, whichever you like  
-hatch env create   # makes a venv and resolves hashes  
-
-other people to build using my venv : pip install .   
-
+dependencies : requirements.txt  
+using python 3.10.12  
 
 20250418 add local Swagger UI & redoc:  
 https://localhost:18080/docs_local will direct to -> https://localhost:18080/static/swagger/index.html   
