@@ -1,7 +1,56 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build outputs
 build/
-/dist/
-!dist/*.zip
-*.crt
+dist/
+*.log
+logs/
+dist_VM_linux/dist/
+*.exe
+*.dll
+*.so
+*.zip
+*.7z
+
+
+# PyInstaller temporary outputs
+*.manifest
+
+# Keep spec files if they are used for build handoff
+# *.spec
+
+# Secrets / local configs
+.env
+*.env
+config.env
+config_*.env
 *.key
-*.pyc
-static/*
+*.crt
+*.pem
+*.p12
+*.pfx
+
+# Local IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local release package
+release/
+release_*/
+*_release/
