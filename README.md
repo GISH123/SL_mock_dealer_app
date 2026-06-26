@@ -1,5 +1,156 @@
 # SL Mock Dealer App
 
+## Final Repository Status
+
+This repository has been finalized as a Python 3.11.13 handoff repository.
+
+The final layout intentionally separates two responsibilities:
+
+1. **Gateway / bridge build flow** stays at the repository root.
+2. **Mock dealer and game applications** are grouped under `mock_dealer_games/`.
+
+This keeps the original full-build gateway package usable while making the mock dealer tools easier to find, preserve, and import later.
+
+---
+
+## Final Repository Layout
+
+```text
+SL_mock_dealer_app/
+├─ DVR_gateway/
+├─ FM_gateway/
+├─ common/
+├─ dualbridge/
+├─ message_hub/
+├─ static/
+├─ utils/
+├─ mock_dealer_games/
+├─ full_build.spec
+├─ post_build.py
+├─ start_all_windows.bat
+├─ start_all_linux.sh
+├─ requirements.txt
+├─ requirements_py311_locked.txt
+└─ README.md
+```
+
+### Gateway / full-build files kept at root
+
+The following files and folders are intentionally kept at the repository root because they are part of the gateway and full-build workflow:
+
+```text
+DVR_gateway/
+FM_gateway/
+common/
+dualbridge/
+message_hub/
+static/
+utils/
+full_build.spec
+post_build.py
+start_all_windows.bat
+start_all_linux.sh
+requirements.txt
+requirements_py311_locked.txt
+```
+
+The current gateway package should still be built from the repository root with:
+
+```powershell
+python -m PyInstaller --clean --noconfirm full_build.spec
+```
+
+`post_build.py` belongs to the root-level gateway/full-build workflow. In the current handoff version, `full_build.spec` is expected to run `post_build.py` as part of the one-command build flow. If needed, `post_build.py` can still be run manually as a fallback check after PyInstaller.
+
+### Mock dealer games
+
+All mock dealer and game-related tools are now grouped under:
+
+```text
+mock_dealer_games/
+```
+
+Current contents:
+
+```text
+mock_dealer_games/
+├─ dealer_BAC/
+├─ dealer_ball3/
+├─ dealer_dragontiger/
+├─ dealer_dragontiger_ws/
+├─ dealer_gui/
+├─ mock_FM/
+├─ mock_dvr_server/
+├─ card_shown_ui/
+├─ static/
+├─ shared_build_utils.py
+├─ shared_runtime.py
+├─ requirements.txt
+├─ version.txt
+└─ versionhttp.txt
+```
+
+Purpose of the main folders:
+
+| Path | Purpose |
+|---|---|
+| `mock_dealer_games/dealer_BAC/` | Final BAC mock dealer source imported from the remote final project |
+| `mock_dealer_games/dealer_ball3/` | Final BALL3 mock dealer source, merged with the old main branch's BALL3 assets and metadata |
+| `mock_dealer_games/dealer_dragontiger/` | Original DragonTiger mock dealer source from main |
+| `mock_dealer_games/dealer_dragontiger_ws/` | Original DragonTiger WebSocket mock dealer source from main |
+| `mock_dealer_games/dealer_gui/` | Original generic dealer GUI source from main |
+| `mock_dealer_games/mock_FM/` | Original FM mock source from main |
+| `mock_dealer_games/mock_dvr_server/` | Original mock DVR server source from main |
+| `mock_dealer_games/card_shown_ui/` | Shared card UI image assets |
+| `mock_dealer_games/static/` | Swagger/Redoc static assets for mock dealer-related tools |
+| `mock_dealer_games/shared_build_utils.py` | Shared build helper imported from the final remote project |
+| `mock_dealer_games/shared_runtime.py` | Shared runtime helper imported from the final remote project |
+
+### Final cleanup summary
+
+The following cleanup was completed before this README update:
+
+- Gateway build flow was preserved at repository root.
+- `mock_dealer_final_app/` was renamed and reorganized into `mock_dealer_games/`.
+- Final remote `dealer_BAC` source was preserved under `mock_dealer_games/dealer_BAC/`.
+- Final remote `dealer_ball3` source was preserved under `mock_dealer_games/dealer_ball3/`.
+- Existing main-branch mock dealer folders were moved into `mock_dealer_games/` instead of staying scattered at repository root.
+- Runtime/config/build artifacts were kept out of Git.
+
+### Important repository hygiene rule
+
+Do not commit local runtime/config/build artifacts, including:
+
+```text
+.env
+*.env
+config.env
+config_*.env
+server.key
+server.crt
+*.key
+*.crt
+*.pem
+*.p12
+*.pfx
+*.bundle
+*.zip
+*.7z
+*.exe
+*.dll
+*.so
+*.pyd
+dist/
+build/
+logs/
+*.log
+__pycache__/
+```
+
+Bundle files are transfer artifacts only. They should not be committed.
+
+---
+
 ## 20260624 Python 3.11.13 Handoff Build Guide
 
 此專案因 20260624 組織與工作安排調整，整理為可交接版本。
@@ -128,13 +279,15 @@ This does not necessarily mean Python 3.11.13 or exe build failed.
 
 ## 4. Build Executables
 
-Use the existing PyInstaller spec:
+Use the existing PyInstaller spec from the repository root:
 
 ```powershell
 python -m PyInstaller --clean --noconfirm full_build.spec
 ```
 
-After PyInstaller build completes, run:
+In the current handoff version, `full_build.spec` is expected to run `post_build.py` automatically after PyInstaller completes, producing a complete release-style `dist/` package.
+
+If you need to verify or rerun the packaging step manually, run:
 
 ```powershell
 python post_build.py
@@ -204,8 +357,11 @@ mock_dealer_app_py31113_YYYYMMDD/
 ├─ requirements_py311_locked.txt
 ├─ full_build.spec
 ├─ post_build.py
+├─ mock_dealer_games/
 └─ TEST_CHECKLIST.md
 ```
+
+`mock_dealer_games/` is included in the source repository as the consolidated location for mock dealer and game tools. Build outputs should still be distributed separately through the release package, not committed into Git.
 
 ---
 
