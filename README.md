@@ -1,5 +1,163 @@
-dependencies : requirements.txt  
-using python 3.10.12  
+20260624 Python 3.11.13 Handoff Build Guide
+
+此專案因 20260624 組織與工作安排調整，整理為可交接版本。
+本次交接重點是讓接手者可以依照文件完成：
+
+Python 3.11.13 環境建立
+requirements 安裝
+PyInstaller exe build
+本機 smoke test
+offline remote computer exe 測試
+
+注意：下方舊的 Python 3.10.12 內容為歷史紀錄。
+20260624 之後若要重新 build exe，請優先依照本段 Python 3.11.13 流程。
+
+1. Environment
+
+Recommended build environment:
+
+OS: Windows
+Python: 3.11.13
+Environment: conda env mock_dealer_py31113
+Build tool: PyInstaller
+Build spec: full_build.spec
+
+Create environment:
+
+conda create -n mock_dealer_py31113 python=3.11.13 -y
+conda activate mock_dealer_py31113
+python --version
+
+Expected:
+
+Python 3.11.13
+2. Install Dependencies
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+This project requires setuptools==81.0.0.
+
+Reason:
+
+PyInstaller or one of its dependencies may import pkg_resources.
+Recent setuptools >= 82 no longer provides pkg_resources, which may cause:
+
+ModuleNotFoundError: No module named 'pkg_resources'
+
+If this happens, run:
+
+python -m pip install --force-reinstall "setuptools==81.0.0" wheel
+python -c "import setuptools; print(setuptools.__version__)"
+python -c "import pkg_resources; print('pkg_resources ok')"
+
+Expected:
+
+81.0.0
+pkg_resources ok
+
+Generate locked dependency file:
+
+python -m pip freeze --all | Out-File -Encoding utf8 requirements_py311_locked.txt
+3. Test Notes
+
+This project contains integration tests that may require company internal development network services.
+
+Example:
+
+FM / DVR target may point to internal development IP such as 10.146.11.92
+
+Therefore, when building on a local internet-enabled computer outside the company internal network, run_all_tests.py may fail on integration tests.
+
+For this Python 3.11.13 handoff task, the final gate is not run_all_tests.py.
+
+Current validation scope:
+
+1. Python 3.11.13 environment can be created
+2. requirements.txt can be installed
+3. PyInstaller can build executables successfully
+4. generated exe can start on local build machine
+5. generated exe can start on offline remote computer
+
+Optional test command:
+
+python run_all_tests.py
+
+Known test limitation:
+
+Some integration tests may fail outside the company internal network.
+This does not necessarily mean Python 3.11.13 or exe build failed.
+4. Build Executables
+
+Use the existing PyInstaller spec:
+
+python -m PyInstaller --clean --noconfirm full_build.spec
+
+After PyInstaller build completes, run:
+
+python post_build.py
+
+Build output:
+
+dist/
+5. Smoke Test
+
+After build, check the generated executables under dist/.
+
+Minimum smoke test:
+
+1. dist folder is generated
+2. main GUI exe can start
+3. no immediate ImportError
+4. no missing config / cert / asset error on startup
+5. app can be closed normally
+6. copied exe can start on offline remote computer
+6. Offline Remote Computer Note
+
+The remote test computer has no internet access.
+
+Do not run these commands on the offline remote computer:
+
+conda create ...
+pip install ...
+
+Recommended workflow:
+
+1. Build exe on internet-enabled local computer
+2. Copy dist folder and handoff documents to shared network drive
+3. Copy release folder from shared network drive to offline remote computer
+4. Run exe smoke test on offline remote computer
+7. Recommended Handoff Package
+mock_dealer_app_py31113_YYYYMMDD/
+├─ dist/
+├─ README.md
+├─ requirements.txt
+├─ requirements_py311_locked.txt
+├─ full_build.spec
+├─ post_build.py
+└─ TEST_CHECKLIST.md
+==================================================================================================
+
+20250729 龍虎百家 mock dealer  
+模擬荷官端: PH龍虎百家  莊閒各一張牌 比數字大小  
+用PH 百家的影片  只是只要看位置1   位置2   
+跟推論端對測跑幾局  
+
+
+環境建置流程:  
+conda create -n mock_dealer_20250729 python=3.10.12 -y   
+conda activate mock_dealer_20250729  
+python -m pip install -U pip  
+pip install -r requirements.txt  
+
+==================================================================================================
+
+20250623 add pyproject.toml to replace requirement.txt  
+pip install --upgrade pip build  
+pip install hatch  # OR poetry, whichever you like  
+hatch env create   # makes a venv and resolves hashes  
+
+other people to build using my venv : pip install .   
+
 
 20250418 add local Swagger UI & redoc:  
 https://localhost:18080/docs_local will direct to -> https://localhost:18080/static/swagger/index.html   
