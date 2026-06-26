@@ -65,3 +65,18 @@ for name, script in [
     ("dealer_gui_exec",         "dealer_gui/main.py"),
 ]:
     executables.append(build_component(name, script))
+
+
+# Run post-build packaging automatically after PyInstaller finishes.
+# This makes one build command enough:
+# python -m PyInstaller --clean --noconfirm full_build.spec
+
+import subprocess
+import sys
+from pathlib import Path
+
+_post_build = Path(SPECPATH) / "post_build.py"
+if not _post_build.exists():
+    raise FileNotFoundError(f"post_build.py not found: {_post_build}")
+
+subprocess.run([sys.executable, str(_post_build)], check=True)
