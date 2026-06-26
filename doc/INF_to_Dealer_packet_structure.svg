@@ -72,7 +72,7 @@
 
   <!-- CMD_SCAN_RESULT = 0xBA0005 -->
   <rect x="10" y="440" width="930" height="65" fill="none" stroke="#333" stroke-width="1"/>
-  <text x="25" y="460" font-size="13" font-weight="bold">CMD_SCAN_RESULT (0xBA0005):</text>
+  <text x="25" y="460" font-size="13" font-weight="bold">CMD_SCAN_RESULT (0xBA0005) - 註： 傳統百家樂荷官端會發此命令，但意義不詳:</text>
   <text x="25" y="475" font-size="12">• Body = 
     <tspan font-weight="bold">gmcode</tspan> (14B), 
     <tspan font-weight="bold">index</tspan> (2B), 
@@ -99,7 +99,7 @@
 
   <!-- CMD_CANCEL_RESULT = 0xBA0008 -->
   <rect x="10" y="650" width="930" height="60" fill="none" stroke="#333" stroke-width="1"/>
-  <text x="25" y="670" font-size="13" font-weight="bold">CMD_CANCEL_RESULT (0xBA0008):</text>
+  <text x="25" y="670" font-size="13" font-weight="bold">CMD_CANCEL_RESULT (0xBA0008) - 註：傳統百家樂不會發此命令:</text>
   <text x="25" y="685" font-size="12">• Body = 
     <tspan font-weight="bold">gmcode</tspan> (14B)
   </text>
@@ -107,7 +107,7 @@
 
   <!-- CMD_PREDICT_REF = 0xBA0009 -->
   <rect x="10" y="720" width="930" height="60" fill="none" stroke="#333" stroke-width="1"/>
-  <text x="25" y="740" font-size="13" font-weight="bold">CMD_PREDICT_REF (0xBA0009):</text>
+  <text x="25" y="740" font-size="13" font-weight="bold">CMD_PREDICT_REF (0xBA0009) - 註：傳統百家樂不會發此命令:</text>
   <text x="25" y="755" font-size="12">• Body = 
     <tspan font-weight="bold">gmcode</tspan> (14B)
   </text>
@@ -125,17 +125,17 @@
   <rect x="10" y="825" width="930" height="60" fill="none" stroke="#333" stroke-width="1"/>
   <text x="25" y="845" font-size="13" font-weight="bold">CMD_LOGIN (0xAB0002):</text>
   <text x="25" y="860" font-size="12">• Body = 
-    <tspan font-weight="bold">gmcode</tspan> (14B)
+    <tspan font-weight="bold">svrid(寫死1001)</tspan> (4B)
   </text>
-  <text x="25" y="875" font-size="11" fill="#666">(Struct format: '!3i4s')</text>
+  <text x="25" y="875" font-size="11" fill="#666">(Struct format: '!4s')</text>
   
    <!-- CMD_PREDICT_RESULT = 0xAB0004 -->
   <rect x="10" y="885" width="930" height="80" fill="none" stroke="#333" stroke-width="1"/>
   <text x="25" y="900" font-size="13" font-weight="bold">CMD_PREDICT_RESULT (0xAB0004):</text>
   <text x="25" y="915" font-size="12">• Body = 
-    <tspan font-weight="bold">gmcode</tspan> (14B)
+    <tspan font-weight="bold">gmcode</tspan> (14B) <tspan font-weight="bold">count</tspan> (2B)
   </text>
-  <text x="25" y="930" font-size="11" fill="#666">(Struct format: '!14s')  -  註，main branch版本就已經沒有使用到CMD_PREDICT_RESULT，改為在DealerClient.sendPredictResult()裡面寫死封包結構</text>
+  <text x="25" y="930" font-size="11" fill="#666">(Struct format: '!14sh')  -  註，main branch版本就已經沒有使用到CMD_PREDICT_RESULT，改為在DealerClient.sendPredictResult()裡面寫死封包結構</text>
   <text x="25" y="945" font-size="11" fill="#666"> body = struct.pack('!14sh', self.gamecode, count)</text>
 
 </svg>
