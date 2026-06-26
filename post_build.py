@@ -40,13 +40,19 @@ print("[✅] Copied config.env → dist/config.env")
 # else:
 #     print("[⚠️] Warning: server.crt/key not found, skipping HTTPS cert copy.")
 
-# post_build.py  (at the very end)
-for fname in ["generate_ssl.sh", "start_all.sh"]:                       # ✨ NEW
+# Copy launcher scripts into dist/
+for fname in ["generate_ssl.sh", "start_all_linux.sh", "start_all_windows.bat"]:
     src = root / fname
     dst = dist / fname
+
+    if not src.exists():
+        print(f"[⚠️] Warning: {fname} not found, skipping")
+        continue
+
     shutil.copy2(src, dst)
-    # make the shell script executable once it's in dist/
+
+    # Make Linux shell scripts executable once they are in dist/
     if fname.endswith(".sh"):
         dst.chmod(0o777)
 
-print("[✅] Added start_all.sh to dist/")
+print("[✅] Added launcher scripts to dist/")
