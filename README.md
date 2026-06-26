@@ -1,132 +1,202 @@
-20260624 Python 3.11.13 Handoff Build Guide
+# SL Mock Dealer App
+
+## 20260624 Python 3.11.13 Handoff Build Guide
 
 此專案因 20260624 組織與工作安排調整，整理為可交接版本。
+
 本次交接重點是讓接手者可以依照文件完成：
 
-Python 3.11.13 環境建立
-requirements 安裝
-PyInstaller exe build
-本機 smoke test
-offline remote computer exe 測試
+1. Python 3.11.13 環境建立
+2. `requirements.txt` 安裝
+3. PyInstaller exe build
+4. 本機 smoke test
+5. offline remote computer exe 測試
 
-注意：下方舊的 Python 3.10.12 內容為歷史紀錄。
-20260624 之後若要重新 build exe，請優先依照本段 Python 3.11.13 流程。
+> 注意：下方舊的 Python 3.10.12 / 2025 開發紀錄為歷史紀錄。  
+> 20260624 之後若要重新 build exe，請優先依照本段 Python 3.11.13 流程。
 
-1. Environment
+---
+
+## 1. Environment
 
 Recommended build environment:
 
-OS: Windows
-Python: 3.11.13
-Environment: conda env mock_dealer_py31113
-Build tool: PyInstaller
-Build spec: full_build.spec
+| Item | Value |
+|---|---|
+| OS | Windows |
+| Python | 3.11.13 |
+| Conda env | `mock_dealer_py31113` |
+| Build tool | PyInstaller |
+| Build spec | `full_build.spec` |
 
 Create environment:
 
+```powershell
 conda create -n mock_dealer_py31113 python=3.11.13 -y
 conda activate mock_dealer_py31113
 python --version
+```
 
 Expected:
 
+```text
 Python 3.11.13
-2. Install Dependencies
+```
+
+---
+
+## 2. Install Dependencies
+
+```powershell
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+```
 
-This project requires setuptools==81.0.0.
+This project requires:
+
+```text
+setuptools==81.0.0
+```
 
 Reason:
 
-PyInstaller or one of its dependencies may import pkg_resources.
-Recent setuptools >= 82 no longer provides pkg_resources, which may cause:
+PyInstaller or one of its dependencies may import `pkg_resources`. Recent `setuptools >= 82` no longer provides `pkg_resources`, which may cause:
 
+```text
 ModuleNotFoundError: No module named 'pkg_resources'
+```
 
 If this happens, run:
 
+```powershell
 python -m pip install --force-reinstall "setuptools==81.0.0" wheel
 python -c "import setuptools; print(setuptools.__version__)"
 python -c "import pkg_resources; print('pkg_resources ok')"
+```
 
 Expected:
 
+```text
 81.0.0
 pkg_resources ok
+```
 
 Generate locked dependency file:
 
+```powershell
 python -m pip freeze --all | Out-File -Encoding utf8 requirements_py311_locked.txt
-3. Test Notes
+```
+
+---
+
+## 3. Test Notes
 
 This project contains integration tests that may require company internal development network services.
 
 Example:
 
-FM / DVR target may point to internal development IP such as 10.146.11.92
+```text
+FM / DVR target may point to an internal development IP.
+```
 
-Therefore, when building on a local internet-enabled computer outside the company internal network, run_all_tests.py may fail on integration tests.
+Therefore, when building on a local internet-enabled computer outside the company internal network, `run_all_tests.py` may fail on integration tests.
 
-For this Python 3.11.13 handoff task, the final gate is not run_all_tests.py.
+For this Python 3.11.13 handoff task, the final gate is **not** `run_all_tests.py`.
 
 Current validation scope:
 
-1. Python 3.11.13 environment can be created
-2. requirements.txt can be installed
-3. PyInstaller can build executables successfully
-4. generated exe can start on local build machine
-5. generated exe can start on offline remote computer
+1. Python 3.11.13 environment can be created.
+2. `requirements.txt` can be installed.
+3. PyInstaller can build executables successfully.
+4. Generated exe can start on local build machine.
+5. Generated exe can start on offline remote computer.
 
 Optional test command:
 
+```powershell
 python run_all_tests.py
+```
 
 Known test limitation:
 
+```text
 Some integration tests may fail outside the company internal network.
 This does not necessarily mean Python 3.11.13 or exe build failed.
-4. Build Executables
+```
+
+---
+
+## 4. Build Executables
 
 Use the existing PyInstaller spec:
 
+```powershell
 python -m PyInstaller --clean --noconfirm full_build.spec
+```
 
 After PyInstaller build completes, run:
 
+```powershell
 python post_build.py
+```
 
 Build output:
 
+```text
 dist/
-5. Smoke Test
+```
 
-After build, check the generated executables under dist/.
+---
+
+## 5. Smoke Test
+
+After build, check the generated executables under `dist/`.
 
 Minimum smoke test:
 
-1. dist folder is generated
-2. main GUI exe can start
-3. no immediate ImportError
-4. no missing config / cert / asset error on startup
-5. app can be closed normally
-6. copied exe can start on offline remote computer
-6. Offline Remote Computer Note
+1. `dist/` folder is generated.
+2. Main GUI exe can start.
+3. No immediate `ImportError`.
+4. No missing config / cert / asset error on startup.
+5. App can be closed normally.
+6. Copied exe can start on offline remote computer.
+
+Example:
+
+```powershell
+dist\dealer_gui_exec\dealer_gui_exec.exe
+```
+
+---
+
+## 6. Offline Remote Computer Note
 
 The remote test computer has no internet access.
 
-Do not run these commands on the offline remote computer:
+Do **not** run these commands on the offline remote computer:
 
+```powershell
 conda create ...
 pip install ...
+```
 
 Recommended workflow:
 
-1. Build exe on internet-enabled local computer
-2. Copy dist folder and handoff documents to shared network drive
-3. Copy release folder from shared network drive to offline remote computer
-4. Run exe smoke test on offline remote computer
-7. Recommended Handoff Package
+1. Build exe on an internet-enabled local computer.
+2. Prepare release folder.
+3. Compress the release folder into a single `.7z` archive.
+4. Copy the `.7z` archive to the shared network drive.
+5. Copy the `.7z` archive from the shared network drive to the offline remote computer local disk.
+6. Extract on the offline remote computer local disk.
+7. Run exe smoke test from the offline remote computer local disk.
+
+Do not run exe directly from the shared network drive.
+
+---
+
+## 7. Recommended Handoff Package
+
+```text
 mock_dealer_app_py31113_YYYYMMDD/
 ├─ dist/
 ├─ README.md
@@ -135,186 +205,347 @@ mock_dealer_app_py31113_YYYYMMDD/
 ├─ full_build.spec
 ├─ post_build.py
 └─ TEST_CHECKLIST.md
-==================================================================================================
+```
 
-20250729 龍虎百家 mock dealer  
-模擬荷官端: PH龍虎百家  莊閒各一張牌 比數字大小  
-用PH 百家的影片  只是只要看位置1   位置2   
-跟推論端對測跑幾局  
+---
 
+## 8. Repository Hygiene
 
-環境建置流程:  
-conda create -n mock_dealer_20250729 python=3.10.12 -y   
-conda activate mock_dealer_20250729  
-python -m pip install -U pip  
-pip install -r requirements.txt  
+The repository should keep source code and handoff documents only.
 
-==================================================================================================
+Do not commit:
 
-20250623 add pyproject.toml to replace requirement.txt  
-pip install --upgrade pip build  
-pip install hatch  # OR poetry, whichever you like  
-hatch env create   # makes a venv and resolves hashes  
+```text
+dist/
+build/
+dist_VM_linux/dist/
+*.exe
+*.dll
+*.so
+*.pyd
+*.zip
+*.7z
+.env
+*.env
+config.env
+config_*.env
+*.key
+*.crt
+*.pem
+*.p12
+*.pfx
+logs/
+*.log
+```
 
-other people to build using my venv : pip install .   
+Build outputs and sanitized exe packages should be transferred separately as release artifacts, not committed into the source tree.
 
+---
 
-20250418 add local Swagger UI & redoc:  
-https://localhost:18080/docs_local will direct to -> https://localhost:18080/static/swagger/index.html   
-https://localhost:18080/redoc  => not done at the moment  
+# Historical Notes
 
+The following sections are older development notes. They are kept for context only.
 
-20250415 紀錄 : bridge/main.py 使用時，同一個instance不能先http，再轉https，須重開  
-嘗試錯誤流程 : 先http mode，嘗試postman打入，成功 ，這時在同一個instance的UI上，先stop，再點https，再start，這時雖然不會報錯，但postman打入過來就會出錯  
-需要重新再開一個bridge.py再直接點https開一個https bridge才能成功  
+---
 
-================================================================================================
-Mock Dealer Real DVR Test
-This test script (test_to_real_DVR.py) performs integration checks by sending HTTP POST commands to a DVR Bridge server.
+## 20250729 龍虎百家 Mock Dealer
+
+模擬荷官端：PH 龍虎百家，莊閒各一張牌，比數字大小。
+
+使用 PH 百家的影片，只看位置 1、位置 2，並與推論端對測跑幾局。
+
+Historical environment setup:
+
+```powershell
+conda create -n mock_dealer_20250729 python=3.10.12 -y
+conda activate mock_dealer_20250729
+python -m pip install -U pip
+pip install -r requirements.txt
+```
+
+---
+
+## 20250623 pyproject.toml Note
+
+Added `pyproject.toml` to replace / improve the old `requirements.txt` workflow.
+
+```powershell
+pip install --upgrade pip build
+pip install hatch
+hatch env create
+```
+
+For other people to build using the package:
+
+```powershell
+pip install .
+```
+
+---
+
+## 20250418 Local Swagger UI and Redoc
+
+Local Swagger UI:
+
+```text
+https://localhost:18080/docs_local
+```
+
+Redirects to:
+
+```text
+https://localhost:18080/static/swagger/index.html
+```
+
+Redoc note:
+
+```text
+https://localhost:18080/redoc
+```
+
+At the time of writing, Redoc was not fully completed.
+
+---
+
+## 20250415 Bridge Instance Note
+
+`bridge/main.py` 使用時，同一個 instance 不能先 HTTP，再轉 HTTPS，須重開。
+
+Observed issue:
+
+1. Start HTTP mode.
+2. Send Postman request successfully.
+3. In the same UI instance, click Stop.
+4. Switch to HTTPS.
+5. Click Start.
+6. No immediate error is shown, but incoming Postman requests fail.
+
+Required workaround:
+
+```text
+Restart bridge.py and directly start HTTPS bridge mode.
+```
+
+---
+
+# Mock Dealer Real DVR Test
+
+This test script, `test_to_real_DVR.py`, performs integration checks by sending HTTP POST commands to a DVR Bridge server.
 
 It simulates a real dealer workflow:
 
-Start recording
+1. Start recording.
+2. Start placing bets.
+3. Keepalive pings.
+4. Stop placing bets.
+5. Stop recording.
 
-Start placing bets
+---
 
-Keepalive pings
+## HTTP POST API Reference
 
-Stop placing bets
+All HTTP requests are POST requests.
 
-Stop recording
+Use the actual internal DVR IP only inside the company internal test environment.
 
-🌐 HTTP POST API Reference
-All HTTP requests are POST requests to:
+| Endpoint | Purpose | Sample Body |
+|---|---|---|
+| `/record/start` | Start recording | `{ "table": "T032", "gmcode": "BJ20250411_11240", "dvr_ip": "<DVR_IP>" }` |
+| `/place/start` | Start placing | `{ "table": "T032", "gmcode": "BJ20250411_11240", "dvr_ip": "<DVR_IP>" }` |
+| `/keepalive` | Keep connection alive | `{ "table": "T032", "gmcode": "BJ20250411_11240", "dvr_ip": "<DVR_IP>" }` |
+| `/place/stop` | Stop placing | `{ "table": "T032", "gmcode": "BJ20250411_11240", "dvr_ip": "<DVR_IP>" }` |
+| `/record/stop` | Stop recording | `{ "table": "T032", "gmcode": "BJ20250411_11240", "dvr_ip": "<DVR_IP>" }` |
 
-Endpoint	Purpose	Sample Body  
-/record/start	Start recording	{ "table": "T032", "gmcode": "BJ20250411_11240" ,"dvr_ip" : "10.146.11.92"}  
-/place/start	Start placing	{ "table": "T032", "gmcode": "BJ20250411_11240" ,"dvr_ip" : "10.146.11.92"}  
-/keepalive	Keep connection alive	{ "table": "T032", "gmcode": "BJ20250411_11240" ,"dvr_ip" : "10.146.11.92"}  
-/place/stop	Stop placing	{ "table": "T032", "gmcode": "BJ20250411_11240" ,"dvr_ip" : "10.146.11.92"}  
-/record/stop	Stop recording	{ "table": "T032", "gmcode": "BJ20250411_11240" ,"dvr_ip" : "10.146.11.92"}  
-table: Table ID (e.g., "T032")  
+`table`: Table ID, for example `T032`.
 
+---
 
-🛠 Manual Testing with curl
-You can manually post the same requests with curl like this:
+## Manual Testing with curl
 
-# Start Recording
-curl -X POST https://127.0.0.1:18080/record/start -H "Content-Type: application/json" -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"10.146.11.92\"}"  
-curl -X 'GET' \
-  'https://localhost:18080/record/start?gmcode=string&table=T032&dvr_ip=10.146.11.92' \
-  -H 'accept: application/json'  
+Replace `<DVR_IP>` with the actual DVR IP inside the internal development network.
 
-Example http:  
+### Start Recording
 
-curl -X POST http://127.0.0.1:18081/record/start -H "Content-Type: application/json" -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"10.146.11.92\"}"  
-curl -X 'GET' \
-  'http://localhost:18081/record/start?gmcode=string&table=T032&dvr_ip=10.146.11.92' \
-  -H 'accept: application/json'  
+HTTPS POST:
 
-# Start Placing
-curl -X POST https://127.0.0.1:18080/place/start -H "Content-Type: application/json" -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"10.146.11.92\"}"
-curl -X 'GET' \
-  'https://localhost:18080/place/start?gmcode=string&table=T032&dvr_ip=10.146.11.92' \
-  -H 'accept: application/json'
+```bash
+curl -X POST https://127.0.0.1:18080/record/start \
+  -H "Content-Type: application/json" \
+  -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"<DVR_IP>\"}"
+```
 
-# Keepalive Ping
-curl -X POST http://127.0.0.1:18080/keepalive -H "Content-Type: application/json" -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"10.146.11.92\"}"
-curl -X 'GET' \
-  'https://localhost:18080/keepalive?gmcode=string&table=T032&dvr_ip=10.146.11.92' \
-  -H 'accept: application/json'
+HTTPS GET:
 
-# Stop Placing
-curl -X POST http://127.0.0.1:18080/place/stop -H "Content-Type: application/json" -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"10.146.11.92\"}"
-curl -X 'GET' \
-  'https://localhost:18080/place/stop?gmcode=string&table=T032&dvr_ip=10.146.11.92' \
-  -H 'accept: application/json'  
+```bash
+curl -X GET "https://localhost:18080/record/start?gmcode=string&table=T032&dvr_ip=<DVR_IP>" \
+  -H "accept: application/json"
+```
 
-# Stop Recording
-curl -X POST http://127.0.0.1:18080/record/stop -H "Content-Type: application/json" -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"10.146.11.92\"}"  
-curl -X 'GET' \
-  'https://127.0.0.1:18080/record/stop?gmcode=string&table=T032&dvr_ip=10.146.11.92' \
-  -H 'accept: application/json'  
+HTTP POST:
 
+```bash
+curl -X POST http://127.0.0.1:18081/record/start \
+  -H "Content-Type: application/json" \
+  -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"<DVR_IP>\"}"
+```
 
-If using HTTPS (https://127.0.0.1:8080), you might need to add -k to ignore SSL certificate issues:  
-curl -k -X POST https://127.0.0.1:8080/record/start ...  
+HTTP GET:
+
+```bash
+curl -X GET "http://localhost:18081/record/start?gmcode=string&table=T032&dvr_ip=<DVR_IP>" \
+  -H "accept: application/json"
+```
+
+### Start Placing
+
+```bash
+curl -X POST https://127.0.0.1:18080/place/start \
+  -H "Content-Type: application/json" \
+  -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"<DVR_IP>\"}"
+
+curl -X GET "https://localhost:18080/place/start?gmcode=string&table=T032&dvr_ip=<DVR_IP>" \
+  -H "accept: application/json"
+```
+
+### Keepalive Ping
+
+```bash
+curl -X POST http://127.0.0.1:18080/keepalive \
+  -H "Content-Type: application/json" \
+  -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"<DVR_IP>\"}"
+
+curl -X GET "https://localhost:18080/keepalive?gmcode=string&table=T032&dvr_ip=<DVR_IP>" \
+  -H "accept: application/json"
+```
+
+### Stop Placing
+
+```bash
+curl -X POST http://127.0.0.1:18080/place/stop \
+  -H "Content-Type: application/json" \
+  -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"<DVR_IP>\"}"
+
+curl -X GET "https://localhost:18080/place/stop?gmcode=string&table=T032&dvr_ip=<DVR_IP>" \
+  -H "accept: application/json"
+```
+
+### Stop Recording
+
+```bash
+curl -X POST http://127.0.0.1:18080/record/stop \
+  -H "Content-Type: application/json" \
+  -d "{\"table\": \"T032\", \"gmcode\": \"BJ20250411_11240\", \"dvr_ip\": \"<DVR_IP>\"}"
+
+curl -X GET "https://127.0.0.1:18080/record/stop?gmcode=string&table=T032&dvr_ip=<DVR_IP>" \
+  -H "accept: application/json"
+```
+
+If using HTTPS with a self-signed certificate, add `-k` to ignore SSL certificate issues:
+
+```bash
+curl -k -X POST https://127.0.0.1:8080/record/start ...
+```
+
+---
 
 # DVR Demo Stack
 
-End‑to‑end playground that mimics a casino **dealer‑client → HTTP bridge →
-DVR recorder** workflow.
+End-to-end playground that mimics a casino dealer-client to HTTP bridge to DVR recorder workflow.
 
-GUI (Tk) ──TCP──► pydealerclient
-│
-▼
-FastAPI bridge (HTTP/HTTPS) ──TCP──► DVR server (mock or real)
+```text
+GUI (Tk)
+  │
+  ├─ TCP ──► pydealerclient
+  │
+  ▼
+FastAPI bridge (HTTP/HTTPS)
+  │
+  └─ TCP ──► DVR server, mock or real
+```
 
+---
 
 ## Components
 
 | Folder | What it is | How to run |
-|--------|------------|------------|
+|---|---|---|
 | `dealer_gui/` | Mock dealer application with video prediction results | `python -m dealer_gui` |
-| `bridge/` | FastAPI service that converts HTTP/HTTPS to the binary DVR socket protocol | `python -m bridge --dvr-ip 10.146.11.92` |
-| `mocks/` | `mock_dvr_server.py` – a fake DVR listening on **TCP 11007** | `python -m mocks.mock_dvr_server` |
-| `tests/` | Helper launchers<br>• `test_mock2mock.py` starts **all three** above<br>• `test_integration.py` CI script that exercises both HTTP & HTTPS | see script headers |
+| `bridge/` | FastAPI service that converts HTTP/HTTPS to the binary DVR socket protocol | `python -m bridge --dvr-ip <DVR_IP>` |
+| `mocks/` | `mock_dvr_server.py`, a fake DVR listening on TCP 11007 | `python -m mocks.mock_dvr_server` |
+| `tests/` | Helper launchers and integration scripts | See script headers |
 
-## Quick demo (all python)
+---
+
+## Quick Demo
 
 ```bash
-# 1. start fake DVR
+# 1. Start fake DVR
 python -m mocks.mock_dvr_server
 
-# 2. start bridge (HTTP)
+# 2. Start bridge over HTTP
 python -m bridge --dvr-ip 127.0.0.1
 
-# 3. start GUI
+# 3. Start GUI
 python -m dealer_gui
+```
 
+---
 
+# 2025/04/10 Older Manual README Notes
 
+## mock_dealer_app
 
+Historical PyInstaller commands:
 
-
-
-
-
-  
-  
-  
-  
-  
-  
-2025/04/10 之前手寫的 README.md  
-  
-# mock_dealer_app  
-
-command for pyinstaller:
-pyinstaller --noconsole dealer.py => before mock_dvr integration
+```powershell
+pyinstaller --noconsole dealer.py
 pyinstaller --noconsole main.py
+```
 
-記得要將card_shown_ui複製到exe所在的資料夾 才能顯示卡牌在ui上
+Remember to copy `card_shown_ui` to the exe folder so the UI can show card images.
 
+---
 
+## 20250411 HTTP / HTTPS DVR Server Requests
 
-# 20250411 run for http/https requests for dvr server
+To test HTTPS, generate a self-signed certificate first.
 
-為了要讓測試能測試https,須先進行步驟：
+This generates `server.key` and `server.crt`, valid for 365 days:
 
-# generates server.key (private) + server.crt (public) valid for 365 days
+```powershell
 pip install cryptography
-generate_self_signed_cert.py
-此為開發環境用的方法，如果在實際生產環境，為了更安全，
-需額外設立條件或方式存取server.key跟crt
+python generate_self_signed_cert.py
+```
 
+This method is for development environment only. In production, a more secure way should be used to manage access to `server.key` and `server.crt`.
 
-# tests
+---
 
-test_integration.py :  
-只嘗試http request(cmd)至mock_dvr_server, 模擬任何人post至mock_dvr_server應有的規範與測試結果  
+## Tests
 
-test_main.py :  
-將mock_dvr_server、dvr_bridge_api、dealer_app.py全都開起來，這時可以開啟pydealerclient做測試，  
-20250410測試與debug後，確認可正常接收pydealerclient的detection結果並顯示於dealer_app的UI上  
-並且也送出對應的dvr_packets給mock_dvr_server無錯誤  
+### `test_integration.py`
+
+Attempts HTTP requests from CMD to `mock_dvr_server`.
+
+Purpose:
+
+```text
+Simulate expected request format and test result for requests sent to mock_dvr_server.
+```
+
+### `test_main.py`
+
+Starts:
+
+1. `mock_dvr_server`
+2. `dvr_bridge_api`
+3. `dealer_app.py`
+
+Then open `pydealerclient` for testing.
+
+Historical result from 20250410:
+
+```text
+Confirmed that the app can correctly receive detection results from pydealerclient,
+display them on dealer_app UI, and send corresponding DVR packets to mock_dvr_server.
+```
