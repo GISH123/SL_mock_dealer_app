@@ -1,0 +1,18 @@
+build/
+*.spec
+dist/
+!dist/*.zip
+
+# local/runtime files
+.vscode/
+__pycache__/
+*/__pycache__/
+logs/
+*/logs/
+*.log
+.env
+*.env
+server.crt
+server.key
+dist*/
+build/
