@@ -1058,14 +1058,29 @@ class DealerGUI:
             return
 
         # ---- empty class ----
-        # Mapping rules:
-        #   Latency: 0=cardback, 1=real, 2=empty
-        #   DT/Baccarat: 0=cardback, 53 (and 99) = empty; other values are treated as real cards
+        # IMPORTANT: class-id namespace is mode-specific.
+        #
+        # Latency:
+        #   0=cardback, 1=real, 2=empty
+        #
+        # BAC Classic (6 slots) uses traditional pydealerclient sparse dealer IDs:
+        #   C01..C13 = 1..13
+        #   D01..D13 = 17..29
+        #   S01..S13 = 33..45
+        #   H01..H13 = 49..61
+        # Therefore dealer class-id 53 == H05 / hong_5 and MUST be a real BAC card.
+        #
+        # For BAC Classic:
+        #   0=cardback (handled above), 99=empty/sentinel.
+        #
+        # DT / other non-latency modes keep the existing 53/99 empty behavior.
         is_empty = False
         try:
             v = int(card_val)
             if self.is_latency_mode():
                 is_empty = (v == 2) or (v not in (0, 1, 2))
+            elif self._is_bac_classic_mode():
+                is_empty = (v == 99)
             else:
                 is_empty = (v in (53, 99))
         except Exception:
@@ -1301,9 +1316,16 @@ class DealerGUI:
             v = int(card_val)
         except Exception:
             return False
-        # BAC/DT convention: 0=cardback, 53/99=empty, real card IDs are all other valid card IDs.
-        if v in (0, 53, 99):
+
+        # 0 is cardback and 99 is empty/sentinel.
+        if v in (0, 99):
             return False
+
+        # BAC Classic uses sparse dealer IDs, where 53 == H05 / hong_5.
+        # Preserve the existing DT/non-BAC interpretation of 53 as empty.
+        if (not self._is_bac_classic_mode()) and v == 53:
+            return False
+
         return self._bac_rank_from_classid(v) is not None
 
     def _bac_rank_from_classid(self, card_val):
@@ -1320,7 +1342,9 @@ class DealerGUI:
             v = int(card_val)
         except Exception:
             return None
-        if v in (0, 53, 99):
+        # BAC sparse dealer-ID decoder.
+        # 53 % 16 == 5, so dealer class-id 53 is H05 / hong_5.
+        if v in (0, 99):
             return None
         rank = v % 16
         if 1 <= rank <= 13:
