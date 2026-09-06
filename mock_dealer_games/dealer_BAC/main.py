@@ -21,6 +21,7 @@ from shared_runtime import resolve_env_path, runtime_root
 from gui import DealerGUI
 from tcp_proto import MockDealerAppProtocol
 import dvr_client
+from dvr_double_packet_test import DVRDoublePacketTestUI
 
 load_dotenv(resolve_env_path(__file__))
 
@@ -314,6 +315,9 @@ class BACDealerApp:
         row2.pack(anchor='w', pady=(6, 0))
         tk.Radiobutton(row2, text='DT (3 slots)', value='dt3', variable=self._startup_game_mode_var, indicatoron=0, width=16).pack(side='left', padx=(0, 6))
         tk.Radiobutton(row2, text='BAC Classic (6 slots)', value='bac6', variable=self._startup_game_mode_var, indicatoron=0, width=18).pack(side='left')
+        row2b = ttk.Frame(frm)
+        row2b.pack(anchor='w', pady=(6, 0))
+        tk.Radiobutton(row2b, text='DVR Double Packet Test', value='dvr_double', variable=self._startup_game_mode_var, indicatoron=0, width=24).pack(side='left')
         row3 = ttk.Frame(frm)
         row3.pack(anchor='w', pady=(12, 0))
         ttk.Checkbutton(row3, text='Enable DVR', variable=self._startup_dvr_var).pack(side='left')
@@ -323,6 +327,15 @@ class BACDealerApp:
     def _on_startup_confirm(self):
         self.control_mode = (self._startup_mode_var.get() or 'tcp').strip().lower()
         self.game_mode = (self._startup_game_mode_var.get() or 'dt3').strip().lower()
+        if self.game_mode == 'dvr_double':
+            self.use_dvr = False
+            if self._startup_frame is not None:
+                self._startup_frame.destroy()
+                self._startup_frame = None
+            self._dvr_double_test_ui = DVRDoublePacketTestUI(
+                self.root, default_ip=DVR_IP, default_port=DVR_PORT
+            )
+            return
         self.max_slots = 6 if self.game_mode == 'bac6' else 3
         self.use_dvr = bool(self._startup_dvr_var.get())
         if self._startup_frame is not None:
