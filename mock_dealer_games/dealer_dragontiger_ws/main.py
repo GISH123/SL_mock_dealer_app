@@ -4,9 +4,36 @@ import logging
 import tkinter as tk
 from datetime import datetime
 
-# ✅ Load .env BEFORE importing modules that may read env on import
+# ✅ Load .env BEFORE importing modules that may read env on import.
+# Source mode: prefer an existing .env near cwd/source.
+# PyInstaller mode: ALWAYS prefer the .env beside the executable.
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv()
+
+
+def _resolve_runtime_env() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent / ".env"
+
+    candidates = [
+        Path.cwd() / ".env",
+        Path(__file__).resolve().parent / ".env",
+        Path(__file__).resolve().parent.parent / ".env",
+        Path(__file__).resolve().parent.parent.parent / ".env",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
+_ENV_PATH = _resolve_runtime_env()
+if _ENV_PATH.exists():
+    load_dotenv(dotenv_path=_ENV_PATH, override=False)
+else:
+    # Preserve the old python-dotenv fallback behavior in source mode.
+    load_dotenv(override=False)
 
 from dealer_dragontiger_ws.gui       import DealerGUI
 from dealer_dragontiger_ws.tcp_proto import MockDealerAppProtocol
@@ -33,6 +60,12 @@ DVR_IP   = os.getenv("DVR_IP",  "127.0.0.1")
 DVR_PORT = int(os.getenv("DVR_PORT", 11007))
 WS_HOST = os.getenv("WS_HOST")
 WS_PORT = os.getenv("WS_PORT")
+
+log.info("Runtime .env: %s (exists=%s)", _ENV_PATH, _ENV_PATH.exists())
+log.info(
+    "Runtime config TCP=%s:%s WS=%s:%s DVR=%s:%s",
+    PD_HOST, PD_PORT, WS_HOST, WS_PORT, DVR_IP, DVR_PORT,
+)
 
 
 class StartUI:

@@ -26,3 +26,4 @@ typing_extensions==4.13.2
 uvicorn==0.34.0
 setuptools==81.0.0
 wheel==0.47.0
+websockets==13.1
